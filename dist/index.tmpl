@@ -1,0 +1,52 @@
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="dist/style.css">
+	<script src="dist/jquery-3.3.1.min.js"></script>
+</head>
+	<h1>
+		{{ .title }}
+	</h1>
+
+	<form method="POST">
+	<label for="file">File</label>
+    <input type="text" name="name" id="name">
+	<label for="lines">Lines</label>
+    <input type="text" name="lines" id="lines" size=5>
+		<label for="filestart">Head</label>
+		<input type="radio" name="filestart" id="filestart_head">
+		<label for="filestart">Tail</label>
+		<input type="radio" name="filestart" id="filestart_tail">
+    <input type="button" value="View" id="btn_view">
+
+	<pre id="fdata"></pre>
+</form>
+
+<script>
+//fetch by ajax
+		function getData(){
+			var file_name = $("#name").val();
+				$.ajax({
+						method: "POST",
+						dataType: "json",
+						url: "getFileData",
+						data: {filename: file_name},
+						
+						success: function(f_data) {
+							//console.log(f_data);
+							console.log(f_data.filedata);
+							$("#fdata").text(f_data.filedata);
+        		},
+						error: function(err) {
+							console.log(err);
+						}
+
+				});
+		}
+
+		$("#btn_view").click( function(){	
+			getData();
+		});
+
+</script>
+</html>
