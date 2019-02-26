@@ -15,24 +15,26 @@ import (
 
 var filedata string
 var filename string
+var numberoflines string
+var viewtype string
 
 //Read file
 func readfile(filen string) string {
 	filedata := ""
 	file, err := os.Open(filen)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		//fmt.Println(scanner.Text())
 		filedata += scanner.Text() + "\n"
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 
 	return filedata
@@ -66,14 +68,20 @@ func main() {
 	router.POST("/getFileData", func(c *gin.Context) {
 
 		filename := c.PostForm("filename")
+		numberoflines := c.PostForm("numberoflines")
+		viewtype := c.PostForm("viewtype")
 
 		c.JSON(200, gin.H{
-			"status":   "OK",
-			"filename": filename,
-			"filedata": readfile(filename),
+			"status":        "OK",
+			"filename":      filename,
+			"numberoflines": numberoflines,
+			"viewtype":      viewtype,
+			"filedata":      readfile(filename),
 		})
 
-		fmt.Printf("File name: %s", filename)
+		fmt.Printf("\nFile name: %s\n", filename)
+		fmt.Printf("No of Lines: %s\n", numberoflines)
+		fmt.Printf("View Type: %s\n", viewtype)
 
 	})
 

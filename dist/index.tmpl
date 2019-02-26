@@ -12,11 +12,11 @@
 	<label for="file">File</label>
     <input type="text" name="name" id="name">
 	<label for="lines">Lines</label>
-    <input type="text" name="lines" id="lines" size=5>
+    <input type="text" name="lines" id="lines" value="10" size=5>
 		<label for="filestart">Head</label>
-		<input type="radio" name="filestart" id="filestart_head">
+		<input type="radio" name="viewtype" value="head">
 		<label for="filestart">Tail</label>
-		<input type="radio" name="filestart" id="filestart_tail">
+		<input type="radio" name="viewtype" value="tail" checked>
     <input type="button" value="View" id="btn_view">
 
 	<pre id="fdata"></pre>
@@ -26,11 +26,14 @@
 //fetch by ajax
 		function getData(){
 			var file_name = $("#name").val();
+			var num_of_lines = $("#lines").val();
+			var view_type = $("input[name='viewtype']:checked").val()
+
 				$.ajax({
 						method: "POST",
 						dataType: "json",
 						url: "getFileData",
-						data: {filename: file_name},
+						data: {filename: file_name, numberoflines: num_of_lines, viewtype: view_type},
 						
 						success: function(f_data) {
 							//console.log(f_data);
