@@ -3,41 +3,39 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
-var filedata string
 var filename string
 var numberoflines string
 var viewtype string
+var viewcmd string
 
 //Read file
-func readfile(filen string) string {
-	filedata := ""
+func readfile(cmd string, filen string, noflines string) (string, error) {
+
 	file, err := os.Open(filen)
 	if err != nil {
-		log.Print(err)
+		log.Println(err)
+		return "", err
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		//fmt.Println(scanner.Text())
-		filedata += scanner.Text() + "\n"
+	out, err := exec.Command(cmd, "-n", noflines, filen).Output()
+	if err != nil {
+		log.Println(err)
+		return "", err
 	}
+	//fmt.Printf("The file data is %s\n", out)
 
-	if err := scanner.Err(); err != nil {
-		log.Print(err)
-	}
-
-	return filedata
+	return string(out), nil
 }
 
 func main() {
@@ -71,13 +69,35 @@ func main() {
 		numberoflines := c.PostForm("numberoflines")
 		viewtype := c.PostForm("viewtype")
 
-		c.JSON(200, gin.H{
-			"status":        "OK",
-			"filename":      filename,
-			"numberoflines": numberoflines,
-			"viewtype":      viewtype,
-			"filedata":      readfile(filename),
-		})
+		if viewtype == "cat" {
+			viewcmd = "/bin/cat"
+		} else if viewtype == "head" {
+			viewcmd = "/usr/bin/head"
+		} else if viewtype == "tail" {
+			viewcmd = "/usr/bin/tail"
+		} else {
+			viewcmd = "/bin/cat"
+		}
+
+		data, err := readfile(viewcmd, filename, numberoflines)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status":   "ERROR",
+				"filename": filename,
+				"error":    err,
+			})
+
+		} else {
+
+			c.JSON(http.StatusOK, gin.H{
+				"status":        "OK",
+				"filename":      filename,
+				"numberoflines": numberoflines,
+				"viewtype":      viewtype,
+				"filedata":      data,
+			})
+		}
 
 		fmt.Printf("\nFile name: %s\n", filename)
 		fmt.Printf("No of Lines: %s\n", numberoflines)

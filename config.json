@@ -1,4 +1,6 @@
 {
     "addressport" : "0.0.0.0:3221",
-    "allowedextensions" : "log"
+    "allowedextensions" : [".log",".txt",".logs",".gz"],
+    "maxlinestoread" : 1000,
+    "restrictedpaths" : ["/etc","/lib"]
 }
