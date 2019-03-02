@@ -1,6 +1,12 @@
-{
-    "addressport" : "0.0.0.0:3221",
-    "allowedextensions" : [".log",".txt",".logs",".gz"],
+{   
+    "ostype" : "linux",
+    "addressport" : "0.0.0.0:5665",
+    "catbinary" : "/bin/cat",
+    "headbinary" : "/usr/bin/head",
+    "tailbinary" : "/usr/bin/tail",
+    "zcatbinary" : "/usr/bin/zcat",
+    "allowedextensions" : [".log",".logs",".txt",".gz",".1"],
     "maxlinestoread" : 1000,
-    "restrictedpaths" : ["/etc","/lib"]
+    "loglistsize" : 10,
+    "logspaths" : ["/logs","/app/logs","/var/log"]
 }
