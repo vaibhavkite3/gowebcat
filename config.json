@@ -5,8 +5,9 @@
     "headbinary" : "/usr/bin/head",
     "tailbinary" : "/usr/bin/tail",
     "zcatbinary" : "/usr/bin/zcat",
+    "lsbinary" : "/bin/ls",
     "allowedextensions" : [".log",".logs",".txt",".gz",".1"],
     "maxlinestoread" : 1000,
-    "loglistsize" : 10,
+    "maxfilelistsize" : 10,
     "logspaths" : ["/logs","/app/logs","/var/log"]
 }

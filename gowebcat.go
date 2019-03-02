@@ -29,6 +29,20 @@ func getextn(filen string) string {
 	return extn
 }
 
+// FUNC : To list files in folder
+
+func listfiles(folderpath string, lsbin string, headbin string, ext string, maxls int) (string, error) {
+	maxlsint := strconv.Itoa(maxls)
+	cmdstr := lsbin + " " + folderpath + "/*" + ext + " | " + headbin + " -n " + maxlsint
+	fmt.Printf("%s", cmdstr)
+	cout, cerr := exec.Command("bash", "-c", cmdstr).Output()
+	if cerr != nil {
+		log.Println(cerr)
+		return "", cerr
+	}
+	return string(cout), nil
+}
+
 // FUNC : To read file content
 func readfile(cmd string, filen string, noflines string, extn string, zcbin string, catbin string) (string, error) {
 
@@ -92,7 +106,7 @@ func main() {
 	//Load HTML Files
 	router.LoadHTMLGlob("dist/*")
 
-	// POST func serve data
+	// POST func serve file data
 	router.POST("/getfiledata", func(c *gin.Context) {
 
 		//reset validation flag
@@ -184,6 +198,50 @@ func main() {
 		fmt.Printf("View Type: %s\n", viewtype)
 		fmt.Printf("File extension is: %s\n", extension)
 
+	})
+
+	//POST func to serve dir list
+	router.POST("/getfolderlistextn", func(c *gin.Context) {
+		//Read log paths from config
+		logspaths := viper.GetStringSlice("logspaths")
+		allowedextensions := viper.GetStringSlice("allowedextensions")
+
+		//Responce folder list with JSON
+		c.JSON(http.StatusOK, gin.H{
+			"status":    "OK",
+			"logspaths": logspaths,
+			"extn":      allowedextensions,
+		})
+	})
+
+	//POST func to serve file list from requested folder
+	router.POST("/getfilelist", func(c *gin.Context) {
+		//Read bin paths from config
+		headbinary := viper.GetString("headbinary")
+		lsbinary := viper.GetString("lsbinary")
+		maxfilelistsize := viper.GetInt("maxfilelistsize")
+		//maxfls, _ := strconv.Atoi(maxfilelistsize)
+
+		//Read POST data
+		folderpath := c.PostForm("folderpath")
+		extn := c.PostForm("extn")
+
+		data, err := listfiles(folderpath, lsbinary, headbinary, extn, maxfilelistsize)
+
+		//Responce to POST
+		if err != nil {
+			//responce if error in JSON format
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status": "ERROR",
+				"error":  err,
+			})
+		} else {
+			//Responce files list with JSON
+			c.JSON(http.StatusOK, gin.H{
+				"status": "OK",
+				"files":  data,
+			})
+		}
 	})
 
 	//GET Func
