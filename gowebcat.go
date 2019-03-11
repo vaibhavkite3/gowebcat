@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -31,7 +32,7 @@ func getextn(filen string) string {
 
 // FUNC : To list files in folder
 
-func listfiles(folderpath string, findbin string, mtime string, headbin string, ext string, maxls int) (string, error) {
+func listfiles(folderpath string, findbin string, mtime string, headbin string, ext string, maxls int) ([]string, error) {
 	var cmdstr = ""
 	maxlsint := strconv.Itoa(maxls)
 	if ext == "*" || ext == "" && mtime == "*" || mtime == "" {
@@ -48,9 +49,9 @@ func listfiles(folderpath string, findbin string, mtime string, headbin string, 
 	cout, cerr := exec.Command("bash", "-c", cmdstr).Output()
 	if cerr != nil {
 		log.Println(cerr)
-		return "", cerr
+		return nil, cerr
 	}
-	return string(cout), nil
+	return strings.Split(strings.TrimSpace(string(cout)), "\n"), nil
 }
 
 // FUNC : To read file content
