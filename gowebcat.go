@@ -35,14 +35,14 @@ func getextn(filen string) string {
 func listfiles(folderpath string, findbin string, mtime string, headbin string, ext string, maxls int) ([]string, error) {
 	var cmdstr = ""
 	maxlsint := strconv.Itoa(maxls)
-	if ext == "*" || ext == "" && mtime == "*" || mtime == "" {
-		cmdstr = findbin + " " + folderpath + " | " + headbin + " -n " + maxlsint
-	} else if ext == "*" || ext == "" && mtime != "" {
-		cmdstr = findbin + " " + folderpath + " -mtime " + mtime + " | " + headbin + " -n " + maxlsint
-	} else if mtime == "*" || mtime == "" && ext != "" {
-		cmdstr = findbin + " " + folderpath + " -name *" + ext + " | " + headbin + " -n " + maxlsint
+	if (ext == "*" || ext == "") && (mtime == "*" || mtime == "") {
+		cmdstr = findbin + " " + folderpath + " -type f" + " | " + headbin + " -n " + maxlsint
+	} else if (ext == "*" || ext == "") && mtime != "" {
+		cmdstr = findbin + " " + folderpath + " -mtime " + mtime + " -type f" + " | " + headbin + " -n " + maxlsint
+	} else if (mtime == "*" || mtime == "") && ext != "" {
+		cmdstr = findbin + " " + folderpath + " -name *" + ext + " -type f" + " | " + headbin + " -n " + maxlsint
 	} else {
-		cmdstr = findbin + " " + folderpath + " -name *" + ext + " -mtime " + mtime + " | " + headbin + " -n " + maxlsint
+		cmdstr = findbin + " " + folderpath + " -name *" + ext + " -mtime " + mtime + " -type f" + " | " + headbin + " -n " + maxlsint
 	}
 
 	fmt.Printf("%s", cmdstr)
