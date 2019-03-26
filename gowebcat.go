@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -31,16 +32,26 @@ func getextn(filen string) string {
 
 // FUNC : To list files in folder
 
-func listfiles(folderpath string, lsbin string, headbin string, ext string, maxls int) (string, error) {
+func listfiles(folderpath string, findbin string, mtime string, headbin string, ext string, maxls int) ([]string, error) {
+	var cmdstr = ""
 	maxlsint := strconv.Itoa(maxls)
-	cmdstr := lsbin + " " + folderpath + "/*" + ext + " | " + headbin + " -n " + maxlsint
+	if (ext == "*" || ext == "") && (mtime == "*" || mtime == "") {
+		cmdstr = findbin + " " + folderpath + " -type f" + " | " + headbin + " -n " + maxlsint
+	} else if (ext == "*" || ext == "") && mtime != "" {
+		cmdstr = findbin + " " + folderpath + " -mtime " + mtime + " -type f" + " | " + headbin + " -n " + maxlsint
+	} else if (mtime == "*" || mtime == "") && ext != "" {
+		cmdstr = findbin + " " + folderpath + " -name *" + ext + " -type f" + " | " + headbin + " -n " + maxlsint
+	} else {
+		cmdstr = findbin + " " + folderpath + " -name *" + ext + " -mtime " + mtime + " -type f" + " | " + headbin + " -n " + maxlsint
+	}
+
 	fmt.Printf("%s", cmdstr)
 	cout, cerr := exec.Command("bash", "-c", cmdstr).Output()
 	if cerr != nil {
 		log.Println(cerr)
-		return "", cerr
+		return nil, cerr
 	}
-	return string(cout), nil
+	return strings.Split(strings.TrimSpace(string(cout)), "\n"), nil
 }
 
 // FUNC : To read file content
@@ -150,7 +161,7 @@ func main() {
 		//2. Check if extension is allowed
 		for e := 0; e < len(allowedextensions); e++ {
 
-			if allowedextensions[e] == extension {
+			if allowedextensions[e] == extension || allowedextensions[e] == "*" {
 				extnallowedflag = true
 			}
 
@@ -205,12 +216,14 @@ func main() {
 		//Read log paths from config
 		logspaths := viper.GetStringSlice("logspaths")
 		allowedextensions := viper.GetStringSlice("allowedextensions")
+		mtimes := viper.GetStringSlice("mtimes")
 
 		//Responce folder list with JSON
 		c.JSON(http.StatusOK, gin.H{
 			"status":    "OK",
 			"logspaths": logspaths,
 			"extn":      allowedextensions,
+			"mtimes":    mtimes,
 		})
 	})
 
@@ -218,15 +231,15 @@ func main() {
 	router.POST("/getfilelist", func(c *gin.Context) {
 		//Read bin paths from config
 		headbinary := viper.GetString("headbinary")
-		lsbinary := viper.GetString("lsbinary")
+		findbinary := viper.GetString("findbinary")
 		maxfilelistsize := viper.GetInt("maxfilelistsize")
-		//maxfls, _ := strconv.Atoi(maxfilelistsize)
 
 		//Read POST data
 		folderpath := c.PostForm("folderpath")
 		extn := c.PostForm("extn")
+		mtime := c.PostForm("mtime")
 
-		data, err := listfiles(folderpath, lsbinary, headbinary, extn, maxfilelistsize)
+		data, err := listfiles(folderpath, findbinary, mtime, headbinary, extn, maxfilelistsize)
 
 		//Responce to POST
 		if err != nil {

@@ -5,9 +5,10 @@
     "headbinary" : "/usr/bin/head",
     "tailbinary" : "/usr/bin/tail",
     "zcatbinary" : "/usr/bin/zcat",
-    "lsbinary" : "/bin/ls",
-    "allowedextensions" : [".log",".logs",".txt",".gz",".1"],
+    "findbinary" : "/usr/bin/find",
     "maxlinestoread" : 1000,
     "maxfilelistsize" : 10,
-    "logspaths" : ["/logs","/app/logs","/var/log"]
+    "logspaths" : ["/logs","/app/logs","/var/log"],
+    "allowedextensions" : [".log",".logs",".txt",".gz",".1"],
+    "mtimes" : ["*","-3","-2","-1","+1","+2","+3"]
 }
