@@ -8,9 +8,10 @@ import VueLogger from 'vuejs-logger'
 import mqlOptions from './plugins/mqlOptions.js'
 import VueLocalStorage from 'vue-localstorage'
 import { loadLanguageAsync, i18n } from './setup/i18n-setup.js'
-import VuejsDialog from 'vuejs-dialog'
-import 'vuejs-dialog/dist/vuejs-dialog.min.css'
-import '../public/assets/plugins/bootstrap-4.1.2-dist/css/bootstrap.min.css'
+import BootstrapVue from 'bootstrap-vue'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
 
 import Toasted from 'vue-toasted'
 Vue.config.productionTip = false
@@ -26,8 +27,8 @@ const options = {
   showConsoleColors: true
 }
 Vue.use(VueLogger, options)
-Vue.use(VuejsDialog)
 Vue.use(Toasted)
+Vue.use(BootstrapVue)
 var baseURL = 'http://localhost:8080/'
 Vue.use(mqlOptions, {
   baseURL: baseURL,

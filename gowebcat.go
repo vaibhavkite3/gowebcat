@@ -112,10 +112,7 @@ func main() {
 	router := gin.Default()
 
 	// Serve static files
-	router.Static("/dist", "./dist")
-
-	//Load HTML Files
-	router.LoadHTMLGlob("dist/*")
+	router.Static("/", "dist")
 
 	// POST func serve file data
 	router.POST("/getfiledata", func(c *gin.Context) {
@@ -279,13 +276,6 @@ func main() {
 			})
 		}
 
-	})
-
-	//GET Func
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{
-			"title": "GO WEB CAT",
-		})
 	})
 
 	//RUN HTTP Server
