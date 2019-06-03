@@ -1,0 +1,26 @@
+[Unit]
+Description=GOWEBCAT Server
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/usr/share/gowebcat
+ExecStart=/bin/bash -ce "exec /usr/share/gowebcat/gowebcat >> /var/log/gowebcat.log 2>&1"
+# file size
+LimitFSIZE=infinity
+# cpu time
+LimitCPU=infinity
+# virtual memory size
+LimitAS=infinity
+# open files
+LimitNOFILE=infinity
+# processes/threads
+LimitNPROC=infinity
+# total threads (user+kernel)
+TasksMax=infinity
+TasksAccounting=false
+
+
+[Install]
+WantedBy=multi-user.target
