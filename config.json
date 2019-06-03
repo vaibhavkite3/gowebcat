@@ -6,7 +6,7 @@
     "catbinary" : "/bin/cat",
     "headbinary" : "/usr/bin/head",
     "tailbinary" : "/usr/bin/tail",
-    "zcatbinary" : "/usr/bin/zcat",
+    "zcatbinary" : "/bin/zcat",
     "findbinary" : "/usr/bin/find",
     "maxlinestoread" : 1000,
     "maxfilelistsize" : 10,
