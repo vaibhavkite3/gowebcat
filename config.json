@@ -1,4 +1,6 @@
 {   
+    "name" : "gowebcat",
+    "pin" : 1111,
     "ostype" : "linux",
     "addressport" : "0.0.0.0:5665",
     "catbinary" : "/bin/cat",

@@ -257,6 +257,30 @@ func main() {
 		}
 	})
 
+	//POST function to check and validate authentication PIN
+	router.POST("/auth", func(c *gin.Context) {
+		//read pin from config
+		pin := viper.GetInt("pin")
+		//get data from POST
+		userpinstring := c.PostForm("userpin")
+		userpin, _ := strconv.Atoi(userpinstring)
+
+		if pin != userpin {
+			//responce if error in JSON format
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status": "ERROR",
+				"msg":    "not authorised",
+			})
+		} else {
+			//Responce files list with JSON
+			c.JSON(http.StatusOK, gin.H{
+				"status": "OK",
+				"msg":    "successfull",
+			})
+		}
+
+	})
+
 	//GET Func
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
