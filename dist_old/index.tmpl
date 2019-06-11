@@ -1,0 +1,156 @@
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="dist/style.css">
+	<script src="dist/jquery-3.3.1.min.js"></script>
+</head>
+	<h2>
+		{{ .title }}
+	</h2>
+	<label for="logspath">LogsPaths</label>
+	  <select name="logspaths" id="logspaths" class="optdata">
+			<option value=""></option>
+		</select>
+
+		<label for="extn">Extensions</label>
+		<select name="extn" id="extn" class="optdata">
+			<option value=""></option>
+		</select>
+
+		<label for="mtimes">Modified Time</label>
+		<select name="mtimes" id="mtimes" class="optdata">
+			<option value=""></option>
+		</select>
+
+	<label for="file">File</label>
+    <select name="file" id="file">
+			<option value=""></option>
+		</select>
+
+	<label for="lines">Lines</label>
+    <input type="text" name="lines" id="lines" value="10" size=5>
+		<label for="filestart">Head</label>
+		<input type="radio" name="viewtype" value="head">
+		<label for="filestart">Tail</label>
+		<input type="radio" name="viewtype" value="tail" checked>
+    <input type="button" value="View" id="btn_view">
+
+	<pre width="10" id="fdata"></pre>
+
+<script>
+
+//fetch read option details (like extn,logpath,mtime)
+
+function getOptDetails(){
+		$.ajax({
+			method: "POST",
+			dataType: "json",
+			url: "getfolderlistextn",
+
+			success: function(odata){
+				//logspaths
+				$.each(odata.logspaths,function(i,lp) {
+					$('#logspaths').append($('<option>',{
+						value: lp,
+						text: lp
+
+					}));
+				});
+
+				//extensions
+				$.each(odata.extn,function(i,ex) {
+					$('#extn').append($('<option>',{
+						value: ex,
+						text: ex
+
+					}));
+				});
+
+				//mtime
+				$.each(odata.mtimes,function(i,mt) {
+					$('#mtimes').append($('<option>',{
+						value: mt,
+						text: mt
+
+					}));
+				});
+
+			},
+			
+			error: function(error){
+					console.log(error)
+			}
+
+		});
+}
+
+//get file list from selected options
+
+	function getFileList(){
+			var folderpath = $("#logspaths").val();
+			var extn = $("#extn").val();
+			var mtime = $("#mtimes").val();
+			$('#file').empty();
+
+			$.ajax({
+				method: "POST",
+				dataType: "json",
+				url: "getfilelist",
+				data: {folderpath:folderpath,extn:extn,mtime:mtime},
+
+				success: function(flist){
+					$.each(flist.files,function(i,fl) {
+							$('#file').append($('<option>',{
+							value: fl,
+							text: fl
+					
+						}));
+					});
+				},
+				error: function(error){
+					console.log(error)
+				}
+
+			});
+
+	}
+
+//fetch file data
+		function getData(){
+			$("#fdata").text("");
+			var file_name = $("#file").val();
+			var num_of_lines = $("#lines").val();
+			var view_type = $("input[name='viewtype']:checked").val()
+
+				$.ajax({
+						method: "POST",
+						dataType: "json",
+						url: "getfiledata",
+						data: {filename: file_name, numberoflines: num_of_lines, viewtype: view_type},
+						
+						success: function(f_data) {
+							
+							$("#fdata").text(f_data.filedata);
+        		},
+						error: function(err) {
+							
+							$("#fdata").text(err.responseText);
+						}
+
+				});
+		}
+
+		$('.optdata').on('change',function(){
+			getFileList();
+		});
+
+		$("#btn_view").click( function(){	
+			getData();
+		});
+
+		$(document).ready(function(){
+			getOptDetails();
+		});
+
+</script>
+</html>
