@@ -76,19 +76,6 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-axios.interceptors.request.use(function (config) {
-  // if (config.url.indexOf('/r/') !== -1) {  // Check for restricted request
-  if (config.headers.common['Authorization']) {
-    console.log('autorize!')
-  } else {
-    console.log('not authorize')
-  }
-  // }
-  return config
-}, function (error) {
-  return Promise.reject(error)
-})
-
 var vm = new Vue({
   router,
   store,

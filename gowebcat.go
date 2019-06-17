@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
@@ -21,6 +22,7 @@ var numberoflines string
 var viewtype string
 var viewcmd string
 var extension string
+var filesize string
 var extnallowedflag bool
 var validationflag bool
 
@@ -28,6 +30,17 @@ var validationflag bool
 func getextn(filen string) string {
 	extn := filepath.Ext(filen)
 	return extn
+}
+
+// FUNC : To get size of file
+func getfilesize(filen string) (string, error) {
+	fi, err := os.Stat(filen)
+	if err != nil {
+		return "", err
+	}
+
+	s := strconv.FormatInt((fi.Size() / 1024), 10)
+	return s, nil
 }
 
 // FUNC : To list files in folder
@@ -113,6 +126,13 @@ func main() {
 
 	// Serve static files
 	router.Static("/", "dist")
+
+	//mount all log paths
+	logspaths := viper.GetStringSlice("logspaths")
+
+	for _, path := range logspaths {
+		router.Use(static.Serve(path, static.LocalFile(path, false)))
+	}
 
 	// POST func serve file data
 	router.POST("/getfiledata", func(c *gin.Context) {
@@ -250,6 +270,31 @@ func main() {
 			c.JSON(http.StatusOK, gin.H{
 				"status": "OK",
 				"files":  data,
+			})
+		}
+	})
+
+	//POST func to get file size of requested file
+	router.POST("/getfilesize", func(c *gin.Context) {
+
+		//Read POST data
+		filenamewithpath := c.PostForm("filenamewithpath")
+
+		//get file size
+		filesize, err := getfilesize(filenamewithpath)
+
+		//Responce to POST
+		if err != nil {
+			//responce if error in JSON format
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status": "ERROR",
+				"error":  err,
+			})
+		} else {
+			//Responce files size with JSON
+			c.JSON(http.StatusOK, gin.H{
+				"status":   "OK",
+				"filesize": filesize,
 			})
 		}
 	})
